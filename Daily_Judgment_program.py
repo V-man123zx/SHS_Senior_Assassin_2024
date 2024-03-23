@@ -28,8 +28,86 @@ Judgement_Sheet = sh.worksheet("Judgment Sheet") #SUBSHEET
 
 
 
-first_name_list = Elim_responses.col_values(2)[2:]
-last_name_list = info_list.col_values(3)[2:]
-email_list = info_list.col_values(4)[2:]
+
+#get ALL user data for referance
+full_first_names = info_list.col_values(2)[1:]
+full_last_names = info_list.col_values(3)[1:]
+full_emails = info_list.col_values(4)[1:]
+
+# create empty combined list
+full_names_list = []
+
+# combine all names
+for i in range(len(full_first_names)):
+    full_names_list.append((full_first_names[i] + full_last_names[i]).lower().replace(" ", ""))
+
+# lower case all emails:
+full_emails = [i.lower() for i in full_emails]
+
+
+
+#print (full_names_list)
+
+#get all elim responses
+Elim_responses_name_list = Elim_responses.col_values(2)[1:]
+Filter_for_done = Elim_responses.col_values(6)[1:]
+
+# lower case
+Elim_responses_name_list = [i.lower().replace(" ", "") for i in Elim_responses_name_list]
+
+#filter out responses already put in judge sheet
+for i in range(len(Elim_responses_name_list)):
+    if Filter_for_done[i] == 'TRUE':
+        Elim_responses_name_list[i] = ""
+
+Elim_responses_name_list = [i for i in Elim_responses_name_list if i != ""]
+        
+
+
+#print (Elim_responses_name_list)
+
+#create empty lists for editing:
+email_list = [] # only for validation of response
+video_link_list = []
+flagged_list = []
+
+# filter Invalid responses
+for name in Elim_responses_name_list:
+    try:
+        email = full_emails[full_names_list.index(name)] # only for validation of response
+        email_list.append(email) # only for validation of response
+        name_row = Elim_responses.find(name).row
+        video_link_list.append(Elim_responses.acell(name_row, 3))
+        Elim_responses.update(name_row, 6, "TRUE")
+        
+    except:
+        flagged_list.append(name)
+        Elim_responses_name_list.remove(name)
+
+
+
+print(Elim_responses_name_list)
+print (email_list)
+print (flagged_list)
+print (video_link_list)
+
+
+formatted_judgementsheet_name_list = [[name] for name in Elim_responses_name_list]
+formatted_judgementsheet_email_list = [[emails] for emails in email_list]
+formatted_judgementsheet_flagged_list = [[flags] for flags in flagged_list]
+formatted_judgementsheet_video_link_list = [[links] for links in video_link_list]
+
+print (f"A2:A{len(Elim_responses_name_list)+1}")
+
+Judgement_Sheet.update(range_name=f"A2:A{len(Elim_responses_name_list)+1}", values=formatted_judgementsheet_name_list)
+Judgement_Sheet.update(range_name=f"B2:B{len(email_list)+1}", values=formatted_judgementsheet_email_list)
+Judgement_Sheet.update(range_name=f"C2:C{len(video_link_list)+1}", values=formatted_judgementsheet_video_link_list)
+Judgement_Sheet.update(range_name=f"I2:I{len(flagged_list)+1}", values=flagged_list)
+
+print ("done moving to judgment sheet")
+
+
+
+
 
 
