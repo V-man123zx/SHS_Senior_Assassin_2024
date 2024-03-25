@@ -1,6 +1,6 @@
 import gspread
 import random 
-from  Helper_funcs import send_email
+from  Helper_funcs import send_email, Add_Target_Eliminated
 
 
 
