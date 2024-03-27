@@ -10,9 +10,15 @@ from  secrets_1 import Secrets
 
 def send_email(to, subject, txt_to_send):
     From = "shsseniorassasin2024@hotmail.com"
+    
+    # to block email sending for testing comment out below statement
+
     password = Secrets.Email_Password
     
-
+    # to block email sending for testing uncomment out below statements
+    print ("email blocked for testing")
+    password = ""
+    #  
 
     msg = MIMEMultipart()
     msg["From"] = From
@@ -51,7 +57,10 @@ def Add_Target_Eliminated(person_name, email, Target_tracker_sheet_obj):
     new_target_email = Target_tracker_sheet_obj.acell(target_row, 4) # find new target email
     Target_tracker_sheet_obj.update_cell(row, 3, new_target_name) #update new target name
     Target_tracker_sheet_obj.update_cell(row, 3, new_target_email) #update new target email
-    send_email(email, "Senior Assass*n 2024: Elimination Confirmed", f"Congratulations on your elimination, your new target is {new_target_name}")
-    send_email(eliminated_target_email, "Senior Assass*n 2024: You Have Been Eliminated", f"Unfortunatly you have been eliminated by {person_name}")
+
+    print (email + ": " + f"Congratulations on your elimination, your new target is {new_target_name}")
+    print (eliminated_target_email + ": " + f"Unfortunatly you have been eliminated by {person_name}")
+    #send_email(email, "Senior Assass*n 2024: Elimination Confirmed", f"Congratulations on your elimination, your new target is {new_target_name}")
+    #send_email(eliminated_target_email, "Senior Assass*n 2024: You Have Been Eliminated", f"Unfortunatly you have been eliminated by {person_name}")
 
 

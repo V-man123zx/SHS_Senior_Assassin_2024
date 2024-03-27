@@ -50,6 +50,7 @@ full_emails = [i.lower() for i in full_emails]
 
 #get all elim responses
 Elim_responses_name_list = Elim_responses.col_values(2)[1:]
+# Elim_responses_email_list = Elim_responses.col_values(3)[1:]
 Filter_for_done = Elim_responses.col_values(6)[1:]
 
 # lower case
@@ -74,15 +75,20 @@ flagged_list = []
 # filter Invalid responses
 for name in Elim_responses_name_list:
     try:
+        print (str(full_names_list.index(name)) + ":" + name)
         email = full_emails[full_names_list.index(name)] # only for validation of response
         email_list.append(email) # only for validation of response
-        name_row = Elim_responses.find(name).row
-        video_link_list.append(Elim_responses.acell(name_row, 3))
-        Elim_responses.update(name_row, 6, "TRUE")
+        name_row = Elim_responses.find(email).row
+        video_link_list.append(Elim_responses.cell(name_row, 4, value_render_option='UNFORMATTED_VALUE').value)
+        Elim_responses.update_cell(name_row, 6, "TRUE")
         
-    except:
+    except ValueError:
+        print ("flagged: " + name)
         flagged_list.append(name)
-        Elim_responses_name_list.remove(name)
+
+
+for flagged in flagged_list:
+    Elim_responses_name_list.remove(flagged)
 
 
 
@@ -99,10 +105,32 @@ formatted_judgementsheet_video_link_list = [[links] for links in video_link_list
 
 print (f"A2:A{len(Elim_responses_name_list)+1}")
 
-Judgement_Sheet.update(range_name=f"A2:A{len(Elim_responses_name_list)+1}", values=formatted_judgementsheet_name_list)
-Judgement_Sheet.update(range_name=f"B2:B{len(email_list)+1}", values=formatted_judgementsheet_email_list)
-Judgement_Sheet.update(range_name=f"C2:C{len(video_link_list)+1}", values=formatted_judgementsheet_video_link_list)
-Judgement_Sheet.update(range_name=f"I2:I{len(flagged_list)+1}", values=flagged_list)
+
+Judgement_Sheet.batch_clear(["A2:A1000", "B2:B1000", "C2:C1000", "H2:H1000"])
+print (str(formatted_judgementsheet_flagged_list) + ": " + str(len(formatted_judgementsheet_flagged_list)))
+
+if len(formatted_judgementsheet_name_list) == 1:
+    Judgement_Sheet.update("A2", formatted_judgementsheet_name_list[0][0])
+else:
+    Judgement_Sheet.update(range_name=f"A2:A{len(formatted_judgementsheet_name_list)+1}", values=formatted_judgementsheet_name_list)
+
+
+if len(formatted_judgementsheet_email_list) == 1:
+    Judgement_Sheet.update("B2", formatted_judgementsheet_email_list[0][0])
+else:
+    Judgement_Sheet.update(range_name=f"B2:B{len(formatted_judgementsheet_email_list)+1}", values=formatted_judgementsheet_email_list)
+
+
+if len(formatted_judgementsheet_video_link_list) == 1:
+    Judgement_Sheet.update("C2", formatted_judgementsheet_video_link_list[0][0])
+else:
+    Judgement_Sheet.update(range_name=f"C2:C{len(formatted_judgementsheet_video_link_list)+1}", values=formatted_judgementsheet_video_link_list)
+
+
+if len(formatted_judgementsheet_flagged_list) == 1:
+    Judgement_Sheet.update("H2", formatted_judgementsheet_flagged_list[0][0])
+else:
+    Judgement_Sheet.update(range_name=f"H2:H{len(formatted_judgementsheet_flagged_list)+1}", values=formatted_judgementsheet_flagged_list)
 
 print ("done moving to judgment sheet")
 
