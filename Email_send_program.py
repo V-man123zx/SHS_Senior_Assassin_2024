@@ -1,6 +1,7 @@
 import gspread
 import random 
 from  Helper_funcs import send_email, Add_Target_Eliminated
+from time import sleep
 
 
 
@@ -26,18 +27,19 @@ Elim_responses = sh.worksheet("Elim Responses") #SUBSHEET
 Target_tracker = sh.worksheet("Target Tracker") #SUBSHEET
 Judgement_Sheet = sh.worksheet("Judgment Sheet") #SUBSHEET
 
-Eliminations_counted = Target_tracker.col_values(4)[1:]
-why_elims_not_counted = Target_tracker.col_values(5)[1:]
-Names = Target_tracker.col_values(1)[1:]
-Emails = Target_tracker.col_values(2)[1:]
+Eliminations_counted = Judgement_Sheet.col_values(4)[1:]
+why_elims_not_counted = Judgement_Sheet.col_values(5)[1:]
+Names = Judgement_Sheet.col_values(1)[1:]
+Emails = Judgement_Sheet.col_values(2)[1:]
 
 
 for i in range(len(Names)):
     tf = Eliminations_counted[i]
     if tf == "TRUE":
         print ("true")
-        Add_Target_Eliminated(Names[i], Emails[i], Target_tracker)
-    if tf == "FALSE":
+        Add_Target_Eliminated(Emails[i], Target_tracker, info_list)
+    elif tf == "FALSE":
         print ("false")
         print (Emails[i] + ": " + f"Dear {Names[i]}, your elimination does not count because {why_elims_not_counted[i]}")
         #send_email(Emails[i], "Senior Assass*n 2024: Elimination does not count", f"Dear {Names[i]}, your elimination does not count because {why_elims_not_counted[i]}")
+    sleep(2)

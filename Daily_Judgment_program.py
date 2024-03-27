@@ -103,11 +103,17 @@ formatted_judgementsheet_email_list = [[emails] for emails in email_list]
 formatted_judgementsheet_flagged_list = [[flags] for flags in flagged_list]
 formatted_judgementsheet_video_link_list = [[links] for links in video_link_list]
 
-print (f"A2:A{len(Elim_responses_name_list)+1}")
+#print (f"A2:A{len(Elim_responses_name_list)+1}")
+
+false_list = [['FALSE'] for i in range(999)]
+print (len(false_list))
+
+Judgement_Sheet.batch_clear(["A2:A1000", "B2:B1000", "C2:C1000", "H2:H1000", "E2:E1000"])
+
+Judgement_Sheet.update("D2:D1000", false_list, value_input_option="USER_ENTERED")
 
 
-Judgement_Sheet.batch_clear(["A2:A1000", "B2:B1000", "C2:C1000", "H2:H1000"])
-print (str(formatted_judgementsheet_flagged_list) + ": " + str(len(formatted_judgementsheet_flagged_list)))
+#print (str(formatted_judgementsheet_flagged_list) + ": " + str(len(formatted_judgementsheet_flagged_list)))
 
 if len(formatted_judgementsheet_name_list) == 1:
     Judgement_Sheet.update("A2", formatted_judgementsheet_name_list[0][0])

@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from bs4 import BeautifulSoup as bs
 from  secrets_1 import Secrets
+from time import sleep
 
 #class Email:
 
@@ -45,18 +46,35 @@ def send_email(to, subject, txt_to_send):
 
 
 
-def Add_Target_Eliminated(person_name, email, Target_tracker_sheet_obj):
-    row = Target_tracker_sheet_obj.find(person_name).row # find row of person
-    Elim_target_name = Target_tracker_sheet_obj.acell(row, 3) # find old target name
-    target_row = Target_tracker_sheet_obj.find(Elim_target_name).row # find old target row
-    eliminated_target_email = Target_tracker_sheet_obj.acell(target_row, 2) # find eliminated persons email
-    Targets_eliminated = Target_tracker_sheet_obj.acell(row, 5) # get all current targets eliminated
-    new_Targets_eliminated = Targets_eliminated + ", " + Elim_target_name # add new eliminated target
-    Target_tracker_sheet_obj.update_cell(row, 5, new_Targets_eliminated) # update sheet with new eliminated target
-    new_target_name = Target_tracker_sheet_obj.acell(target_row, 3) # find new target name
-    new_target_email = Target_tracker_sheet_obj.acell(target_row, 4) # find new target email
-    Target_tracker_sheet_obj.update_cell(row, 3, new_target_name) #update new target name
-    Target_tracker_sheet_obj.update_cell(row, 3, new_target_email) #update new target email
+def Add_Target_Eliminated(email, Target_tracker_sheet_obj, info_list_sheet_obj):
+    Tracker_person_row = Target_tracker_sheet_obj.find(email).row # find row of person
+    Person_Info_list_row = info_list_sheet_obj.find(email).row
+    person_name = info_list_sheet_obj.cell(Person_Info_list_row, 2).value + " " + info_list_sheet_obj.cell(Person_Info_list_row, 3).value
+    print ("person name: " + person_name)
+    eliminated_target_email = Target_tracker_sheet_obj.cell(Tracker_person_row, 4).value # find old target email
+    print ("Old target email: " + eliminated_target_email)
+    Target_info_list_row = info_list_sheet_obj.find(eliminated_target_email).row
+    Elim_target_name = info_list_sheet_obj.cell(Target_info_list_row, 2).value + " " + info_list_sheet_obj.cell(Target_info_list_row, 3).value
+    print ("Eliminated Target Name: " + Elim_target_name)
+    Tracker_target_row = Target_tracker_sheet_obj.find(eliminated_target_email, in_column=2).row # find old target row
+    print ("Eliminated_Target_row: " + str(Tracker_target_row))
+
+    Targets_eliminated = Target_tracker_sheet_obj.cell(Tracker_person_row, 5).value # get all current targets eliminated
+    print ("Current targets Eliminated: " + str(Targets_eliminated))
+    sleep(0.5)
+    try:
+        new_Targets_eliminated = Targets_eliminated + ", " + Elim_target_name # add new eliminated target
+    except TypeError:
+        new_Targets_eliminated = Elim_target_name
+    print ("New Targets Eliminated: " + new_Targets_eliminated)
+    Target_tracker_sheet_obj.update_cell(Tracker_person_row, 5, new_Targets_eliminated) # update sheet with new eliminated target
+    new_target_email = Target_tracker_sheet_obj.cell(Tracker_target_row, 4).value # find new target email
+    new_target_info_list_row = info_list_sheet_obj.find(new_target_email).row
+    new_target_name = info_list_sheet_obj.cell(new_target_info_list_row, 2).value + " " + info_list_sheet_obj.cell(new_target_info_list_row, 3).value
+    print ("New targets name and email: " + new_target_name + ", " + new_target_email)
+    Target_tracker_sheet_obj.update_cell(Tracker_person_row, 3, new_target_name) #update new target name
+    Target_tracker_sheet_obj.update_cell(Tracker_person_row, 4, new_target_email) #update new target email
+    Target_tracker_sheet_obj.update_cell(Tracker_target_row, 6, "TRUE") # set target to eliminated
 
     print (email + ": " + f"Congratulations on your elimination, your new target is {new_target_name}")
     print (eliminated_target_email + ": " + f"Unfortunatly you have been eliminated by {person_name}")
